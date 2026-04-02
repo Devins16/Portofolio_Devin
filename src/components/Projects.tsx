@@ -18,14 +18,19 @@ import TaekwondoPhone from "@/components/TaekwondoPhone"
 
 
 const Projects = () => {
+    
     return (
         <section id='projects' className='relative py-28 space-y-32'>
+                <h3 className='text-2xl md:text-3xl font-semibold text-white/90 mb-7'>Projects</h3>
+            
             <div className="relative p-8 rounded-3xl border border-white/5 bg-white/[0.02] backdrop-blur-sm">
+            
                 <div className='pointer-events-none absolute right-0 left-1/3 top-8 -z-10 h-[420px] opacity-40 blur-3xl'
                     style={{
                         background: 'radial-gradient(60% 60% at 60% 40%, rgba(20,184,166,0.35) 0%, rgba(18, 8, 36, 0) 70%)'
                     }}
                 />
+                
                 <ScrollReveal stagger={0.15} className='grid grid-cols-1 md:grid-cols-2 items-center'>
                     <div className='relative -pl-50 z-10'>
                         {/* heading */}
