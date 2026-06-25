@@ -14,9 +14,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Devin Syafa",
-  description: "Portofolio",
+export const metadata = {
+  title: "Devin Syafa | Portfolio",
+  description: "Portfolio of Devin Syafa",
+  applicationName: "Devin Syafa Portfolio",
 };
 
 export default function RootLayout({
