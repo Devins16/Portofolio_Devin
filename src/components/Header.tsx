@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaBarsStaggered } from "react-icons/fa6";
+import Image from "next/image";
+
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -18,13 +20,21 @@ const Header = () => {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${isScrolled || isOpen
-          ? "bg-[#0b0416]/70 backdrop-blur-md shadow-[0_0_40px_rgba(113,39,186,0.20)]"
-          : "bg-transparent"
+        ? "bg-[#0b0416]/70 backdrop-blur-md shadow-[0_0_40px_rgba(113,39,186,0.20)]"
+        : "bg-transparent"
         }`}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
         {/* logo */}
-        <Link href="/" className="text-3xl font-extrabold text-[#2DD4BF]">𓅈</Link>
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/profile.png"
+            alt="Devin Syafa"
+            width={48}
+            height={48}
+            className="rounded-full object-cover border border-[#2DD4BF]"
+          />
+        </Link>
 
         {/* dekstop navigation */}
         <nav className="hidden md:flex space-x-10 font-medium text-lg text-white/80">
