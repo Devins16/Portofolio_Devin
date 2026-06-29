@@ -18,6 +18,11 @@ export const metadata = {
   title: "Devin Syafa | Portfolio",
   description: "Portfolio of Devin Syafa",
   applicationName: "Devin Syafa Portfolio",
+   icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
