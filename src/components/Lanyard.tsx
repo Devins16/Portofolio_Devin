@@ -256,7 +256,7 @@ const Lanyard = () => {
                             <div className="relative h-[196px] overflow-hidden rounded-xl">
                                 <div className="absolute bottom-0 left-1/2 h-full w-[64%] -translate-x-1/2 rounded-xl bg-linear-to-b from-[#2DD4BF]/70 via-[#0f766e]/50 to-[#0b1020]" />
                                 <Image
-                                    src="/images/prof.png"
+                                    src="/images/Prof.png"
                                     alt="Devin Syafa"
                                     fill
                                     sizes="240px"
