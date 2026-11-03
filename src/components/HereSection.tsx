@@ -6,11 +6,9 @@ import Lanyard from "./Lanyard";
 import DustZone from "./DustZone";
 import { DustText, DustTypewriter } from "./DustText";
 
-// Font mono untuk label bergaya terminal. Kalau kamu sudah punya font mono di proyek
-// (mis. lewat next/font), ganti isi MONO dengan `var(--nama-variabel-font)`.
+
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace';
 
-// CSS ditulis sendiri (bukan Tailwind) supaya tampilan cyberpunk-nya konsisten dan mudah diubah.
 const CSS = `
 .cp-scan { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255,255,255,.02) 0 1px, transparent 1px 4px); }
 .cp-glow { position: absolute; left: 50%; top: 38%; width: 460px; height: 460px; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; background: radial-gradient(circle, rgba(34,211,238,.26) 0%, rgba(255,42,109,.12) 45%, transparent 70%); filter: blur(30px); }
@@ -60,19 +58,16 @@ const HereSection = () => {
         <section id="home" className="relative min-h-screen">
             <style>{CSS}</style>
 
-            {/* dekorasi: garis scan tipis dan siku di pojok, seperti di halaman Contact */}
             <div className="cp-scan" />
             <span className="cp-bracket tl" />
             <span className="cp-bracket br" />
 
             <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-6 md:flex-row md:items-center md:px-12">
-                {/* lanyard: di kiri pada layar lebar, di atas pada HP. */}
                 <div className="relative z-10 h-[520px] w-full shrink-0 md:h-screen md:w-5/12">
                     <div className="cp-glow" />
                     <Lanyard />
                 </div>
 
-                {/* teks: huruf yang tersentuh kartu berubah jadi debu */}
                 <DustZone className="cp-text">
                     <ScrollReveal stagger={0.12}>
                         <span className="cp-tag">Hello! Welcome to my portfolio</span>
@@ -127,7 +122,6 @@ const HereSection = () => {
                     </div>
 
                     <div className="cp-actions">
-                        {/* sesuaikan href dengan id section / route di situsmu */}
                         <a className="cp-btn" href="#projects">
                             ▶ View projects
                         </a>

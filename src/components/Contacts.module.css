@@ -277,7 +277,6 @@
   50% { opacity: 0.25; }
 }
 
-/* ---------- responsive ---------- */
 @media (max-width: 900px) {
   .frame { grid-template-columns: 1fr; gap: 44px; }
   .tl { left: -6px; }

@@ -4,14 +4,10 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
 type Props = {
-    /** Gambar logo milikmu (PNG/SVG transparan, sebaiknya hijau atau putih). Kosong = lentera neon bawaan. */
     src?: string;
-    /** Jeda minimum dan maksimum antar kemunculan (ms) */
     minDelay?: number;
     maxDelay?: number;
-    /** Lama logo tampil (ms) */
     duration?: number;
-    /** Ukuran dasar logo (px), diacak sekitar nilai ini */
     size?: number;
 };
 
@@ -19,7 +15,6 @@ type Flash = { id: number; x: number; y: number; rot: number; size: number };
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
-// CSS biasa (bukan Tailwind), supaya posisi dan efek glow tidak bergantung pada konfigurasi lain.
 const CSS = `
 .nf-wrap { position: fixed; z-index: 2147482000; pointer-events: none; opacity: 0; animation-name: nf-flash; animation-timing-function: linear; animation-fill-mode: both; }
 .nf-aura { position: absolute; inset: -60%; border-radius: 50%; background: radial-gradient(circle, rgba(0,255,80,.22) 0%, rgba(0,255,80,.08) 35%, transparent 65%); }
@@ -38,7 +33,6 @@ const CSS = `
 }
 `;
 
-// Lentera neon orisinal (gambar buatan sendiri, bukan logo resmi apa pun)
 const Lantern = () => (
     <svg
         className="nf-logo"
@@ -69,7 +63,6 @@ const NeonFlash = ({ src, minDelay = 7000, maxDelay = 22000, duration = 1300, si
 
     useEffect(() => {
         if (!mounted) return;
-        // kedipan neon tidak ditampilkan untuk pengunjung yang meminta animasi dikurangi
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
         let t: ReturnType<typeof setTimeout> | undefined;
@@ -80,7 +73,6 @@ const NeonFlash = ({ src, minDelay = 7000, maxDelay = 22000, duration = 1300, si
         };
 
         const show = () => {
-            // jangan muncul saat tab sedang tidak dilihat
             if (document.hidden) {
                 schedule(false);
                 return;
@@ -91,7 +83,6 @@ const NeonFlash = ({ src, minDelay = 7000, maxDelay = 22000, duration = 1300, si
             setFlash({
                 id: ++id,
                 size: s,
-                // hindari navbar di atas dan pemutar musik di pojok kanan bawah
                 x: rand(24, Math.max(24, vw - s - 24)),
                 y: rand(80, Math.max(80, vh - s * 1.2 - 100)),
                 rot: rand(-14, 14),
@@ -125,7 +116,6 @@ const NeonFlash = ({ src, minDelay = 7000, maxDelay = 22000, duration = 1300, si
             <style>{CSS}</style>
             <div className="nf-aura" />
             {src ? (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img className="nf-logo" src={src} alt="" draggable={false} />
             ) : (
                 <Lantern />

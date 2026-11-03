@@ -9,21 +9,20 @@ type Particle = {
     vx: number;
     vy: number;
     age: number;
-    life: number; // dalam satuan frame (60fps)
-    kind: 0 | 1 | 2; // 0 = piksel, 1 = irisan horizontal (RGB split), 2 = karakter data
+    life: number;
+    kind: 0 | 1 | 2; 
     w: number;
     h: number;
     color: string;
     ch: string;
-    snap: number; // hitung mundur sampai "loncatan" glitch berikutnya
-    show: boolean; // partikel berkedip
+    snap: number; 
+    show: boolean; 
 };
 
-const MAX_PARTICLES = 2200; // batas total partikel di layar
-const PER_CHAR = 6; // jumlah partikel per huruf yang hancur
-const MARGIN = 4; // huruf mulai hancur sedikit sebelum benar-benar tersentuh (px)
+const MAX_PARTICLES = 2200;
+const PER_CHAR = 6;
+const MARGIN = 4; 
 
-// Warna cyberpunk: cyan, pink, kuning, putih
 const CYAN = "#22d3ee";
 const PINK = "#ff2a6d";
 const YELLOW = "#fcee0a";
@@ -37,12 +36,10 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
     const zoneRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        // hormati pengguna yang mematikan animasi
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
         const zone = zoneRef.current!;
 
-        // kanvas partikel menempel di <body> supaya tidak terpengaruh transform elemen induk
         const canvas = document.createElement("canvas");
         canvas.setAttribute("aria-hidden", "true");
         canvas.style.cssText =
@@ -68,7 +65,7 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
         let fades: HTMLElement[] = [];
         let dirty = true;
         const mo = new MutationObserver(() => {
-            dirty = true; // typewriter menambah/mengurangi huruf
+            dirty = true; 
         });
         mo.observe(zone, { childList: true, subtree: true });
 
@@ -95,7 +92,6 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
             const c = Math.cos(angle);
             const s = Math.sin(angle);
 
-            // apakah titik (px, py) ada di dalam kartu yang miring?
             const inside = (px: number, py: number, m: number) => {
                 const dx = px - x;
                 const dy = py - y;
@@ -104,7 +100,6 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
                 return Math.abs(u) <= w / 2 + m && v >= -m && v <= h + m;
             };
 
-            // tahap kasar: kalau kartu jauh dari area teks, tidak perlu cek huruf satu per satu
             let near = false;
             if (active && w > 0) {
                 const zr = zone.getBoundingClientRect();
@@ -127,7 +122,6 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
             }
 
             if (near || dusted.size > 0 || fadeActive) {
-                // pusat kartu, dipakai sebagai arah semburan partikel
                 const ccx = x - (h / 2) * s;
                 const ccy = y + (h / 2) * c;
 
@@ -141,7 +135,6 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
                 const toDust: Hit[] = [];
                 const toRestore: HTMLElement[] = [];
 
-                // 1) baca dulu semua posisi (tanpa menulis ke DOM agar tidak memaksa layout berulang)
                 for (const el of chars) {
                     const r = el.getBoundingClientRect();
                     if (r.width === 0) continue;
@@ -169,7 +162,6 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
                     return near && pts.some(([fx, fy]) => inside(r.left + r.width * fx, r.top + r.height * fy, MARGIN));
                 });
 
-                // 2) lalu tulis semua perubahan sekaligus
                 for (const t of toDust) {
                     let dx = t.cx - ccx;
                     let dy = t.cy - ccy;
@@ -177,7 +169,6 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
                     dx /= len;
                     dy /= len;
 
-                    // huruf ter-glitch: berubah warna, pecah RGB, miring, lalu hilang bertahap (steps)
                     const st = t.inner.style;
                     st.transitionDuration = "180ms";
                     st.transitionTimingFunction = "steps(3, end)";
@@ -212,7 +203,6 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
                     }
                 }
 
-                // huruf kembali: muncul bertahap (steps) dengan warna aslinya
                 for (const el of toRestore) {
                     const st = (el.firstElementChild as HTMLElement).style;
                     st.transitionDuration = "420ms";
@@ -224,7 +214,6 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
                     dusted.delete(el);
                 }
 
-                // huruf yang sudah dihapus dari DOM (typewriter) tidak perlu dilacak lagi
                 for (const el of dusted) {
                     if (!el.isConnected) dusted.delete(el);
                 }
@@ -236,10 +225,8 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
                 });
             }
 
-            // partikel glitch
             if (particles.length > 0 || hadParticles) {
                 ctx.clearRect(0, 0, vw, vh);
-                // "lighter": saat pink dan cyan bertumpuk jadi putih, efek aberasi kromatik
                 ctx.globalCompositeOperation = "lighter";
                 ctx.font = `10px ${MONO}`;
                 ctx.textBaseline = "top";
@@ -252,8 +239,6 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
                         particles.pop();
                         continue;
                     }
-
-                    // gerak patah-patah: sesekali melompat ke samping dan berkedip
                     p.snap -= dt;
                     if (p.snap <= 0) {
                         p.x += (Math.random() - 0.5) * (p.kind === 1 ? 26 : 12);

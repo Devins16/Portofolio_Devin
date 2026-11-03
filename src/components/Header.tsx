@@ -13,7 +13,6 @@ const tabs = [
 
 type Rect = { left: number; width: number; barW: number };
 
-// sisi depan bergerak cepat + membal, sisi belakang menyusul pelan -> lensa meregang
 const LEAD = "cubic-bezier(0.3, 1.3, 0.4, 1)";
 const TRAIL = "cubic-bezier(0.25, 0.9, 0.3, 1)";
 
@@ -53,7 +52,6 @@ const Header = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // pindah tab (dipakai klik & scroll-spy)
   const goTo = useCallback((id: string) => {
     const next = tabs.findIndex((t) => t.id === id);
     if (next === -1 || next === prevIdx.current) return;
@@ -67,7 +65,6 @@ const Header = () => {
 
   useEffect(() => () => clearTimeout(movingTimer.current), []);
 
-  // ukur posisi tab aktif
   const measure = useCallback(() => {
     const nav = navRef.current;
     const el = linkRefs.current[active];
@@ -113,7 +110,6 @@ const Header = () => {
     setIsOpen(false);
   };
 
-  // posisi lensa: left & right punya durasi berbeda tergantung arah gerak
   const lensStyle = (r: Rect): React.CSSProperties => {
     const pad = 4;
     const left = r.left - pad;
@@ -141,7 +137,6 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50">
       <style>{GLASS_CSS}</style>
 
-      {/* background header dipisah supaya tidak menjadi "backdrop root" bagi kaca di dalam nav */}
       <div
         aria-hidden="true"
         className={`absolute inset-0 -z-10 bg-[#0b0416]/55 backdrop-blur-md shadow-[0_0_40px_rgba(113,39,186,0.20)] transition-opacity duration-300 ${isScrolled || isOpen ? "opacity-100" : "opacity-0"
@@ -149,7 +144,6 @@ const Header = () => {
       />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
-        {/* logo */}
         <Link href="/" className="flex items-center">
           <Image
             src="/profile.png"
@@ -160,13 +154,11 @@ const Header = () => {
           />
         </Link>
 
-        {/* desktop navigation */}
         <nav
           ref={navRef}
           className="relative hidden md:flex items-center rounded-full font-medium text-lg"
           style={{ gap: 6, padding: "8px 12px" }}
         >
-          {/* 1) bar kaca */}
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 rounded-full"
@@ -184,7 +176,6 @@ const Header = () => {
             }}
           />
 
-          {/* 2) lensa kaca di tab aktif */}
           {rect && (
             <div aria-hidden="true" className="pointer-events-none absolute" style={lensStyle(rect)}>
               <div

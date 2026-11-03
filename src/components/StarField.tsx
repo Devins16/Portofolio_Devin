@@ -3,17 +3,17 @@
 import React, { useEffect, useRef } from "react";
 
 type Star = {
-    bx: number; // posisi dasar (px)
+    bx: number; 
     by: number;
-    d: number; // kedalaman: 0 = jauh, 1 = dekat
-    r: number; // radius (px)
-    tw: number; // kecepatan kelip
-    ph: number; // fase kelip
+    d: number;
+    r: number; 
+    tw: number;
+    ph: number;
     rgb: string;
     glow: boolean;
 };
 
-// Warna bintang dan peluang munculnya (disesuaikan dengan warna situs: putih, teal, ungu, biru muda)
+
 const PALETTE: [string, number][] = [
     ["255,255,255", 0.62],
     ["45,212,191", 0.18],
@@ -32,12 +32,12 @@ const pickColor = () => {
 
 const mod = (n: number, m: number) => ((n % m) + m) % m;
 
-// ---- pengaturan ----
-const DENSITY = 6000; // luas layar (px²) per bintang. Makin kecil = makin banyak bintang
+
+const DENSITY = 6000; 
 const MAX_STARS = 380;
-const MOUSE_PARALLAX = 0.09; // seberapa jauh bintang bergeser mengikuti mouse
-const SCROLL_PARALLAX = 0.25; // seberapa jauh bintang bergeser saat scroll
-const DRIFT_X = 1.5; // kecepatan melayang (px/detik) untuk bintang terdekat
+const MOUSE_PARALLAX = 0.09; 
+const SCROLL_PARALLAX = 0.25; 
+const DRIFT_X = 1.5; 
 const DRIFT_Y = -3;
 
 const StarField = () => {
@@ -65,7 +65,7 @@ const StarField = () => {
 
             const count = Math.round(Math.min(MAX_STARS, Math.max(90, (W * H) / DENSITY)));
             stars = Array.from({ length: count }, () => {
-                const d = Math.pow(Math.random(), 1.6); // lebih banyak bintang jauh daripada yang dekat
+                const d = Math.pow(Math.random(), 1.6); 
                 return {
                     bx: Math.random() * W,
                     by: Math.random() * H,
@@ -81,24 +81,23 @@ const StarField = () => {
 
         const draw = (t: number) => {
             const sec = t / 1000;
-            const M = 20; // margin di luar layar supaya bintang tidak "muncul tiba-tiba"
+            const M = 20; 
             const scroll = window.scrollY;
 
-            // kamera mengikuti mouse dengan halus
+       
             cam.x += (target.x - cam.x) * 0.05;
             cam.y += (target.y - cam.y) * 0.05;
 
             ctx.clearRect(0, 0, W, H);
 
             for (const s of stars) {
-                // bintang dekat bergeser lebih jauh daripada bintang jauh: inilah efek kedalamannya
                 const p = 0.08 + 0.92 * s.d;
                 const x = mod(s.bx + M - cam.x * p + (reduce ? 0 : sec * DRIFT_X * p), W + 2 * M) - M;
                 const y =
                     mod(s.by + M - cam.y * p - scroll * SCROLL_PARALLAX * p + (reduce ? 0 : sec * DRIFT_Y * p), H + 2 * M) - M;
 
                 const twinkle = reduce ? 1 : 0.72 + 0.28 * Math.sin(sec * s.tw + s.ph);
-                const a = (0.25 + 0.65 * s.d) * twinkle; // bintang jauh lebih redup
+                const a = (0.25 + 0.65 * s.d) * twinkle; 
 
                 ctx.fillStyle = `rgba(${s.rgb},${a.toFixed(3)})`;
                 ctx.beginPath();
@@ -125,7 +124,6 @@ const StarField = () => {
         };
 
         const onResize = () => {
-            // abaikan perubahan tinggi kecil (mis. address bar di HP)
             if (window.innerWidth !== W || Math.abs(window.innerHeight - H) > 150) {
                 build();
                 if (reduce) draw(0);
@@ -134,7 +132,7 @@ const StarField = () => {
 
         build();
         if (reduce) {
-            draw(0); // satu gambar statis, tanpa animasi
+            draw(0); 
         } else {
             raf = requestAnimationFrame(loop);
             window.addEventListener("pointermove", onMove, { passive: true });

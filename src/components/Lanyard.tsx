@@ -14,7 +14,6 @@ const BARS = [3, 1, 2, 1, 4, 1, 2, 3, 1, 1, 3, 2, 1, 4, 1, 2, 1, 3, 2, 1, 1, 3, 
 
 const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace';
 
-// Tema cyberpunk untuk kartu. CSS biasa (bukan Tailwind) supaya tampilannya konsisten.
 const CARD_CSS = `
 .cp-card-fx { position: absolute; inset: 0; filter: drop-shadow(7px 7px 0 rgba(190,24,93,.7)) drop-shadow(0 0 16px rgba(34,211,238,.3)); }
 .cp-card-edge { position: absolute; inset: 0; background: linear-gradient(160deg, rgba(34,211,238,.95), rgba(34,211,238,.25) 45%, rgba(255,42,109,.85)); clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px)); }

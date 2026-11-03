@@ -2,18 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 
-/*
-  Setiap huruf dibungkus dua <span>:
-  - luar  (data-dust): tidak pernah bergerak, dipakai DustZone untuk mengukur posisi huruf
-  - dalam            : yang dianimasikan (hilang jadi debu, lalu kembali)
-*/
+
 const Char = ({ ch }: { ch: string }) => (
     <span data-dust className="inline-block">
         <span className="inline-block ease-out transition-[opacity,transform]">{ch}</span>
     </span>
 );
 
-// Kata dibungkus nowrap supaya baris tetap pindah per kata, bukan per huruf
 export const DustChars = ({ text }: { text: string }) => {
     const words = text.split(" ");
     return (
@@ -41,7 +36,6 @@ export const DustText = ({ text, className }: { text: string; className?: string
     </span>
 );
 
-// Pengganti react-simple-typewriter: mengetik tiap kata, kata terakhir tetap tampil (sama seperti loop={1})
 export const DustTypewriter = ({
     words,
     typeSpeed = 65,

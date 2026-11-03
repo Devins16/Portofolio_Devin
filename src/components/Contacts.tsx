@@ -46,7 +46,6 @@ const Contacts = () => {
             setCopied(true)
             setTimeout(() => setCopied(false), 1800)
         } catch {
-            /* clipboard blocked */
         }
     }
 
@@ -58,7 +57,6 @@ const Contacts = () => {
                         <span className={`${styles.corner} ${styles.tl}`} />
                         <span className={`${styles.corner} ${styles.br}`} />
 
-                        {/* LEFT */}
                         <div>
                             <span className={styles.tag}>INCOMING TRANSMISSION</span>
                             <br />
@@ -89,7 +87,6 @@ const Contacts = () => {
                             </div>
                         </div>
 
-                        {/* RIGHT */}
                         <div className={styles.panelWrap}>
                             <div className={styles.panelBorder}>
                                 <div className={styles.panel}>
