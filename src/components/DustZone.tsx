@@ -10,18 +10,28 @@ type Particle = {
     vy: number;
     age: number;
     life: number; // dalam satuan frame (60fps)
-    size: number;
+    kind: 0 | 1 | 2; // 0 = piksel, 1 = irisan horizontal (RGB split), 2 = karakter data
+    w: number;
+    h: number;
     color: string;
-    alpha: number;
+    ch: string;
+    snap: number; // hitung mundur sampai "loncatan" glitch berikutnya
+    show: boolean; // partikel berkedip
 };
 
-const MAX_PARTICLES = 2500; // batas total partikel di layar
-const PER_CHAR = 7; // jumlah partikel per huruf yang hancur
+const MAX_PARTICLES = 2200; // batas total partikel di layar
+const PER_CHAR = 6; // jumlah partikel per huruf yang hancur
 const MARGIN = 4; // huruf mulai hancur sedikit sebelum benar-benar tersentuh (px)
 
-// Warna debu ala Green Lantern
-const DUST_GREEN = "rgb(0,255,80)";
-const DUST_LIGHT = "rgb(170,255,200)"; // sebagian percikan dibuat lebih terang
+// Warna cyberpunk: cyan, pink, kuning, putih
+const CYAN = "#22d3ee";
+const PINK = "#ff2a6d";
+const YELLOW = "#fcee0a";
+const PALETTE = [CYAN, CYAN, PINK, PINK, YELLOW, "#ffffff"];
+const GLYPHS = "01<>/\\|#$%&@=+*";
+const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace';
+
+const pick = <T,>(arr: ArrayLike<T>) => arr[(Math.random() * arr.length) | 0];
 
 const DustZone = ({ children, className }: { children: React.ReactNode; className?: string }) => {
     const zoneRef = useRef<HTMLDivElement>(null);
@@ -117,7 +127,7 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
             }
 
             if (near || dusted.size > 0 || fadeActive) {
-                // pusat kartu, dipakai sebagai arah hembusan debu
+                // pusat kartu, dipakai sebagai arah semburan partikel
                 const ccx = x - (h / 2) * s;
                 const ccy = y + (h / 2) * c;
 
@@ -167,35 +177,50 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
                     dx /= len;
                     dy /= len;
 
-                    const dist = 14 + Math.random() * 22;
-                    t.inner.style.transitionDuration = "320ms";
-                    t.inner.style.opacity = "0";
-                    t.inner.style.transform = `translate(${dx * dist + (Math.random() - 0.5) * 10}px, ${
-                        dy * dist + (Math.random() - 0.5) * 10 - 6
-                    }px) rotate(${(Math.random() - 0.5) * 80}deg) scale(0.4)`;
+                    // huruf ter-glitch: berubah warna, pecah RGB, miring, lalu hilang bertahap (steps)
+                    const st = t.inner.style;
+                    st.transitionDuration = "180ms";
+                    st.transitionTimingFunction = "steps(3, end)";
+                    st.color = pick([CYAN, PINK, YELLOW]);
+                    st.textShadow = `2px 0 ${PINK}, -2px 0 ${CYAN}`;
+                    st.opacity = "0";
+                    st.transform = `translate(${dx * 10 + (Math.random() - 0.5) * 16}px, ${
+                        (Math.random() - 0.5) * 6
+                    }px) skewX(${(Math.random() - 0.5) * 50}deg) scaleX(${1 + Math.random() * 0.8})`;
                     dusted.add(t.el);
 
                     for (let k = 0; k < PER_CHAR && particles.length < MAX_PARTICLES; k++) {
-                        const sp = 0.6 + Math.random() * 1.8;
+                        const roll = Math.random();
+                        const kind: 0 | 1 | 2 = roll < 0.55 ? 0 : roll < 0.85 ? 1 : 2;
+                        const sp = 0.8 + Math.random() * 2.6;
+                        const size = 1.5 + Math.random() * 2.2;
                         particles.push({
                             x: t.r.left + Math.random() * t.r.width,
                             y: t.r.top + Math.random() * t.r.height,
-                            vx: dx * sp + (Math.random() - 0.5) * 0.9,
-                            vy: dy * sp + (Math.random() - 0.5) * 0.9 - 0.35,
+                            vx: dx * sp + (Math.random() - 0.5) * 1.6,
+                            vy: dy * sp * 0.6 + (Math.random() - 0.5) * 0.8,
                             age: 0,
-                            life: 50 + Math.random() * 70,
-                            size: 0.8 + Math.random() * 1.7,
-                            color: Math.random() < 0.25 ? DUST_LIGHT : DUST_GREEN,
-                            alpha: 0.95,
+                            life: 28 + Math.random() * 50,
+                            kind,
+                            w: kind === 1 ? 8 + Math.random() * 22 : size,
+                            h: kind === 1 ? 1.5 + Math.random() * 1.5 : size,
+                            color: pick(PALETTE),
+                            ch: pick(GLYPHS),
+                            snap: Math.random() * 4,
+                            show: true,
                         });
                     }
                 }
 
+                // huruf kembali: muncul bertahap (steps) dengan warna aslinya
                 for (const el of toRestore) {
-                    const inner = el.firstElementChild as HTMLElement;
-                    inner.style.transitionDuration = "900ms";
-                    inner.style.opacity = "";
-                    inner.style.transform = "";
+                    const st = (el.firstElementChild as HTMLElement).style;
+                    st.transitionDuration = "420ms";
+                    st.transitionTimingFunction = "steps(5, end)";
+                    st.opacity = "";
+                    st.transform = "";
+                    st.color = "";
+                    st.textShadow = "";
                     dusted.delete(el);
                 }
 
@@ -211,10 +236,14 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
                 });
             }
 
-            // partikel debu
+            // partikel glitch
             if (particles.length > 0 || hadParticles) {
                 ctx.clearRect(0, 0, vw, vh);
+                // "lighter": saat pink dan cyan bertumpuk jadi putih, efek aberasi kromatik
                 ctx.globalCompositeOperation = "lighter";
+                ctx.font = `10px ${MONO}`;
+                ctx.textBaseline = "top";
+
                 for (let i = particles.length - 1; i >= 0; i--) {
                     const p = particles[i];
                     p.age += dt;
@@ -223,13 +252,43 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
                         particles.pop();
                         continue;
                     }
-                    p.vx = (p.vx + (Math.random() - 0.5) * 0.08) * 0.975;
-                    p.vy = (p.vy + (Math.random() - 0.5) * 0.08 - 0.004) * 0.975;
+
+                    // gerak patah-patah: sesekali melompat ke samping dan berkedip
+                    p.snap -= dt;
+                    if (p.snap <= 0) {
+                        p.x += (Math.random() - 0.5) * (p.kind === 1 ? 26 : 12);
+                        p.y += (Math.random() - 0.5) * 3;
+                        p.snap = 2 + Math.random() * 5;
+                        p.show = Math.random() > 0.22;
+                    }
+                    p.vx *= 0.96;
+                    p.vy *= 0.96;
                     p.x += p.vx * dt;
                     p.y += p.vy * dt;
-                    ctx.globalAlpha = p.alpha * (1 - p.age / p.life);
-                    ctx.fillStyle = p.color;
-                    ctx.fillRect(p.x, p.y, p.size, p.size);
+
+                    if (!p.show) continue;
+
+                    const a = 1 - p.age / p.life;
+                    // posisi dibulatkan ke grid 2px supaya terlihat seperti piksel digital
+                    const px = Math.round(p.x / 2) * 2;
+                    const py = Math.round(p.y / 2) * 2;
+
+                    if (p.kind === 0) {
+                        ctx.globalAlpha = a;
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(px, py, p.w, p.h);
+                    } else if (p.kind === 1) {
+                        // irisan dengan pecahan warna: pink bergeser kiri, cyan bergeser kanan
+                        ctx.globalAlpha = a * 0.85;
+                        ctx.fillStyle = PINK;
+                        ctx.fillRect(px - 2, py, p.w, p.h);
+                        ctx.fillStyle = CYAN;
+                        ctx.fillRect(px + 2, py, p.w, p.h);
+                    } else {
+                        ctx.globalAlpha = a;
+                        ctx.fillStyle = p.color;
+                        ctx.fillText(p.ch, px, py);
+                    }
                 }
                 ctx.globalAlpha = 1;
                 ctx.globalCompositeOperation = "source-over";
@@ -249,6 +308,9 @@ const DustZone = ({ children, className }: { children: React.ReactNode; classNam
                 if (inner) {
                     inner.style.opacity = "";
                     inner.style.transform = "";
+                    inner.style.color = "";
+                    inner.style.textShadow = "";
+                    inner.style.transitionTimingFunction = "";
                 }
             });
             dusted.clear();
